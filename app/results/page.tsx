@@ -1,14 +1,13 @@
-"use client"
+"use client";
 
-import { HotelCard } from "@/components/hotel-card"
-import { AttractionCard } from "@/components/attraction-card"
-import Link from "next/link"
-import { PlaneTakeoff, User, ArrowLeft } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useRouter, useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { getHotels, getAttractions } from "@/lib/data"
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { HotelCard } from "@/components/hotel-card";
+import { AttractionCard } from "@/components/attraction-card";
+import { PlaneTakeoff, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,27 +15,69 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
+import { fetchHotels, fetchAttractions } from "@/lib/hotelService";
 
 export default function ResultsPage() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const location = searchParams.get("location") || "coorg"
-  const [username, setUsername] = useState("")
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const location = searchParams?.get("location") ?? "";
+  
+  const [hotels, setHotels] = useState<any[]>([]);
+  const [attractions, setAttractions] = useState<any[]>([]);
+  const [username, setUsername] = useState("");
+  const [error, setError] = useState("");
+  const [sortOption, setSortOption] = useState("priceLowToHigh");
+  const [filteredHotels, setFilteredHotels] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // In a real app, this would check for authentication
-    const storedName = localStorage.getItem("travelo-username") || "Traveler"
-    setUsername(storedName)
-  }, [])
+    const storedName = localStorage.getItem("travelo-username") || "Traveler";
+    setUsername(storedName);
+
+    const fetchData = async () => {
+      try {
+        console.log("[Travelo] Fetching hotels for:", location);
+        const data = await fetchHotels(location);
+        console.log("[Travelo] fetchHotels returned:", data);
+
+        console.log("[Travelo] Hotels from API call:", data);
+
+        const spots = await fetchAttractions(location);
+        console.log("[Travelo] Attractions from API call:", spots);
+
+        setHotels(data);
+        setFilteredHotels(data);
+        setAttractions(spots || []);
+        setError("");
+      } catch (err) {
+        console.error("[Travelo] Error fetching data:", err);
+        setHotels([]);
+        setAttractions([]);
+        setError("Something went wrong while fetching results. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [location]);
+
+  // Optional: sorting logic if needed
+  useEffect(() => {
+    let sorted = [...hotels];
+    if (sortOption === "priceLowToHigh") {
+      sorted.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+    } else if (sortOption === "priceHighToLow") {
+      sorted.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
+    }
+    setFilteredHotels(sorted);
+  }, [sortOption, hotels]);
 
   const handleSignOut = () => {
-    localStorage.removeItem("travelo-username")
-    router.push("/")
-  }
-
-  const hotels = getHotels(location)
-  const attractions = getAttractions(location)
+    localStorage.removeItem("travelo-username");
+    router.push("/");
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -47,67 +88,74 @@ export default function ResultsPage() {
         </Link>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-full">
+            <Button variant="ghost" size="icon">
               <User className="h-5 w-5" />
-              <span className="sr-only">User menu</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Hi, {username}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>My Profile</DropdownMenuItem>
-            <DropdownMenuItem>My Trips</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleSignOut}>Sign Out</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </header>
-      <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="flex items-center mb-8">
-          <Button variant="ghost" size="sm" className="gap-1" onClick={() => router.push("/welcome")}>
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </Button>
-          <h1 className="text-3xl font-bold ml-4 capitalize">{location}</h1>
-        </div>
 
-        <Tabs defaultValue="hotels" className="w-full">
-          <TabsList className="mb-6">
-            <TabsTrigger value="hotels">Top Hotels</TabsTrigger>
-            <TabsTrigger value="attractions">Top Attractions</TabsTrigger>
-          </TabsList>
-          <TabsContent value="hotels" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {hotels.map((hotel) => (
-                <HotelCard key={hotel.id} hotel={hotel} />
-              ))}
-            </div>
-          </TabsContent>
-          <TabsContent value="attractions" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {attractions.map((attraction) => (
-                <AttractionCard key={attraction.id} attraction={attraction} />
-              ))}
-            </div>
-          </TabsContent>
-        </Tabs>
+      <main className="container mx-auto p-4">
+        {isLoading ? (
+          <div className="flex justify-center items-center h-full min-h-[300px]">
+            <p className="text-xl font-semibold">Loading...</p>
+          </div>
+        ) : (
+          <>
+            <h1 className="text-3xl font-bold capitalize">{location}</h1>
+            <Tabs defaultValue="hotels">
+              <TabsList>
+                <TabsTrigger value="hotels">Top Hotels</TabsTrigger>
+                <TabsTrigger value="attractions">Top Attractions</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="hotels">
+                {error ? (
+                  <p className="text-red-500">{error}</p>
+                ) : filteredHotels.length > 0 ? (
+                  <>
+                    <div className="flex justify-end mb-4">
+                      <select
+                        className="border p-2 rounded"
+                        value={sortOption}
+                        onChange={(e) => setSortOption(e.target.value)}
+                      >
+                        <option value="priceLowToHigh">Price: Low to High</option>
+                        <option value="priceHighToLow">Price: High to Low</option>
+                      </select>
+                    </div>
+                    {filteredHotels.map((hotel) => (
+                      <HotelCard key={hotel.id || hotel.name} hotel={hotel} />
+                    ))}
+                  </>
+                ) : (
+                  <p>No hotels found.</p>
+                )}
+              </TabsContent>
+
+              <TabsContent value="attractions">
+                {attractions.length > 0 ? (
+                  attractions.map((attraction) => (
+                    <AttractionCard key={attraction.id || attraction.name} attraction={attraction} />
+                  ))
+                ) : (
+                  <p>No attractions found.</p>
+                )}
+              </TabsContent>
+            </Tabs>
+
+            {/* Debug: Render raw JSON data */}
+            {/* <pre className="mt-4 bg-gray-100 p-4 rounded">
+              {JSON.stringify(hotels, null, 2)}
+            </pre> */}
+          </>
+        )}
       </main>
-      <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
-        <p className="text-xs text-muted-foreground">© 2024 Travelo. All rights reserved.</p>
-        <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-          <Link className="text-xs hover:underline underline-offset-4" href="#">
-            Terms of Service
-          </Link>
-          <Link className="text-xs hover:underline underline-offset-4" href="#">
-            Privacy
-          </Link>
-          <Link className="text-xs hover:underline underline-offset-4" href="#">
-            Contact
-          </Link>
-        </nav>
-      </footer>
     </div>
-  )
+  );
 }
-

@@ -1,18 +1,33 @@
-const GOOGLE_PLACES_API_KEY = "8fb78451cced0c9ab73432a6a4b6b10ed1f2a346";
+// lib/hotelService.ts
 
-export async function fetchHotels(location: string) {
-  const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=hotels+in+${location}&key=${GOOGLE_PLACES_API_KEY}`;
+export async function fetchHotels(location: string): Promise<any[]> {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_DJANGO_API_URL}/hotels/?location=${encodeURIComponent(location)}`
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch hotels from Django API");
+    }
+    const hotels = await response.json();
+    return hotels;
+  } catch (error) {
+    console.error("Error fetching hotels:", error);
+    return [];
+  }
+}
 
-  const response = await fetch(url);
-  const data = await response.json();
-
-  return data.results.map((hotel: any) => ({
-    id: hotel.place_id,
-    name: hotel.name,
-    location: hotel.formatted_address,
-    rating: hotel.rating,
-    image: hotel.photos ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${hotel.photos[0].photo_reference}&key=${GOOGLE_PLACES_API_KEY}` : "/default-hotel.jpg",
-    price: "N/A",
-    amenities: ["WiFi", "Parking"], // Dummy data
-  }));
+export async function fetchAttractions(location: string): Promise<any[]> {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_DJANGO_API_URL}/attractions/?location=${encodeURIComponent(location)}`
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch attractions from Django API");
+    }
+    const attractions = await response.json();
+    return attractions;
+  } catch (error) {
+    console.error("Error fetching attractions:", error);
+    return [];
+  }
 }

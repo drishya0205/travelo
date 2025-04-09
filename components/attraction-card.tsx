@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Star, MapPin, Heart, Clock } from "lucide-react"
+import { Crown, Star, MapPin, Heart, Clock } from "lucide-react"
 import type { Attraction } from "@/lib/data"
 
 interface AttractionCardProps {
@@ -14,10 +14,20 @@ interface AttractionCardProps {
 export function AttractionCard({ attraction }: AttractionCardProps) {
   const [isFavorite, setIsFavorite] = useState(false)
 
+  // Ensure we format the rating if it is provided as a number.
+  const rating =
+    attraction.average_rating && typeof attraction.average_rating === "number"
+      ? attraction.average_rating.toFixed(1)
+      : "N/A"
+
   return (
     <Card className="overflow-hidden">
       <div className="relative">
-        <img src={attraction.image || "/pretty.jpg"} alt={attraction.name} className="w-full h-48 object-cover" />
+        <img
+          src={attraction.image || "/pretty.jpg"}
+          alt={attraction.name}
+          className="w-full h-48 object-cover"
+        />
         <Button
           variant="ghost"
           size="icon"
@@ -43,8 +53,11 @@ export function AttractionCard({ attraction }: AttractionCardProps) {
             </div>
           </div>
           <div className="flex items-center">
+            {attraction.average_rating !== undefined && attraction.average_rating >= 4.5 && (
+              <Crown className="h-4 w-4 text-yellow-500 mr-1" />
+            )}
             <Star className="h-4 w-4 text-yellow-500 mr-1" />
-            <span className="font-medium">{attraction.rating}</span>
+            <span className="font-medium">{rating}</span>
           </div>
         </div>
       </CardHeader>
@@ -64,4 +77,3 @@ export function AttractionCard({ attraction }: AttractionCardProps) {
     </Card>
   )
 }
-

@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -31,7 +30,6 @@ export function RegisterForm() {
       [name]: value,
     }))
 
-    // Clear errors when typing
     if (name === "password" || name === "confirmPassword") {
       setErrors((prev) => ({
         ...prev,
@@ -68,30 +66,64 @@ export function RegisterForm() {
     return valid
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!validateForm()) {
-      return
-    }
+    if (!validateForm()) return
 
     setIsLoading(true)
 
-    // In a real app, this would register the user with a backend
-    // For demo purposes, we'll just simulate registration
-    setTimeout(() => {
-      // Store username in localStorage for demo purposes
+    try {
+      const res = await fetch("http://localhost:8000/api/traveloapp/register/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
+      })
+
+      if (!res.ok) {
+        const text = await res.text()
+        let errorData
+        try {
+          errorData = JSON.parse(text)
+        } catch {
+          errorData = { detail: text || "Unknown error" }
+        }
+
+        console.error("Registration failed:", errorData)
+        alert("Registration failed: " + (errorData.detail || JSON.stringify(errorData)))
+        setIsLoading(false)
+        return
+      }
+
+      // Save username locally (for demo purposes)
       localStorage.setItem("travelo-username", formData.name)
-      setIsLoading(false)
       router.push("/welcome")
-    }, 1000)
+    } catch (error) {
+      console.error("Error:", error)
+      alert("Something went wrong. Please try again.")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
         <Label htmlFor="name">Full Name</Label>
-        <Input id="name" name="name" placeholder="John Doe" required value={formData.name} onChange={handleChange} />
+        <Input
+          id="name"
+          name="name"
+          placeholder="John Doe"
+          required
+          value={formData.name}
+          onChange={handleChange}
+        />
       </div>
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
@@ -148,4 +180,3 @@ export function RegisterForm() {
     </form>
   )
 }
-

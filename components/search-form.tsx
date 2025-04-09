@@ -1,7 +1,5 @@
 "use client"
 
-import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -17,16 +15,34 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 export function SearchForm() {
   const router = useRouter()
   const [location, setLocation] = useState("")
-  const [checkIn, setCheckIn] = useState<Date>()
-  const [checkOut, setCheckOut] = useState<Date>()
+  const [checkIn, setCheckIn] = useState<Date | undefined>(undefined)
+  const [checkOut, setCheckOut] = useState<Date | undefined>(undefined)
   const [guests, setGuests] = useState("2")
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    // In a real app, we would validate dates, etc.
-    // For demo purposes, we'll just navigate to the results page
-    router.push(`/results?location=${location.toLowerCase() || "coorg"}`)
+    const trimmedLocation = location.trim()
+
+    if (!trimmedLocation) {
+      alert("Please enter a destination!")
+      return
+    }
+
+    if (checkIn && checkOut && checkIn > checkOut) {
+      alert("Check-out date must be after check-in date.")
+      return
+    }
+
+    // Construct query parameters
+    const params = new URLSearchParams({
+      location: trimmedLocation.toLowerCase(),
+      checkIn: checkIn ? format(checkIn, "yyyy-MM-dd") : "",
+      checkOut: checkOut ? format(checkOut, "yyyy-MM-dd") : "",
+      guests,
+    }).toString()
+
+    router.push(`/results?${params}`)
   }
 
   return (
@@ -105,4 +121,3 @@ export function SearchForm() {
     </form>
   )
 }
-

@@ -1,0 +1,18 @@
+<!-- hotels/templates/hotels/rate_attraction.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rate Attraction</title>
+</head>
+<body>
+    <h1>Rate {{ attraction.name }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit Rating</button>
+    </form>
+    <p><a href="{% url 'attraction_list' %}">Back to attraction list</a></p>
+</body>
+</html>

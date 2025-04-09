@@ -33,18 +33,42 @@ export function SignInForm() {
     }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
-    // In a real app, this would validate credentials with a backend
-    // For demo purposes, we'll just simulate a login
-    setTimeout(() => {
-      // Store username in localStorage for demo purposes
+    try {
+      const res = await fetch("http://localhost:8000/api/traveloapp/token/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      })
+
+      if (!res.ok) {
+        throw new Error("Invalid credentials")
+      }
+
+      const data = await res.json()
+
+      // Save tokens in localStorage
+      localStorage.setItem("access", data.access)
+      localStorage.setItem("refresh", data.refresh)
+
+      // Optional: save username too
       localStorage.setItem("travelo-username", formData.email.split("@")[0])
-      setIsLoading(false)
+
       router.push("/welcome")
-    }, 1000)
+    } catch (err) {
+      console.error("Login failed:", err)
+      alert("Login failed. Please check your email and password.")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -89,4 +113,3 @@ export function SignInForm() {
     </form>
   )
 }
-
