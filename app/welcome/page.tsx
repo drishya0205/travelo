@@ -48,7 +48,11 @@ export default function WelcomePage() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Hi, {username}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>My Profile</DropdownMenuItem>
+            <DropdownMenuSeparator />
+              {/* New menu item to view profile */}
+              <DropdownMenuItem onClick={() => router.push("/profile")}>
+                View Profile
+              </DropdownMenuItem>
             <DropdownMenuItem>My Trips</DropdownMenuItem>
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -78,7 +82,7 @@ export default function WelcomePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="group relative overflow-hidden rounded-lg shadow-lg">
                 <img
-                  src="/placeholder.svg?height=400&width=600&text=Coorg"
+                  src="pretty.jpg"
                   alt="Coorg"
                   className="w-full h-64 object-cover transition-transform group-hover:scale-105"
                 />

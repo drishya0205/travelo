@@ -92,6 +92,11 @@ export default function ResultsPage() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Hi, {username}</DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <DropdownMenuSeparator />
+              {/* New menu item to view profile */}
+              <DropdownMenuItem onClick={() => router.push("/profile")}>
+                View Profile
+              </DropdownMenuItem>
             <DropdownMenuItem onClick={handleSignOut}>Sign Out</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
