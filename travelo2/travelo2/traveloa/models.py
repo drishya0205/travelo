@@ -43,3 +43,8 @@ class Attraction(models.Model):
 
     def __str__(self):
         return self.name
+    
+class UserRankings(models.Model):
+    name = models.CharField(max_length=255)
+    eloRating = models.FloatField()
+    ranking = models.IntegerField()
