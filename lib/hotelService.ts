@@ -6,7 +6,7 @@ export async function fetchHotels(location: string): Promise<any[]> {
       `${process.env.NEXT_PUBLIC_DJANGO_API_URL}/hotels/?location=${encodeURIComponent(location)}`
     );
     if (!response.ok) {
-      throw new Error("Failed to fetch hotels from Django API");
+      throw new Error("Failed to fetch hotels from Django API ");
     }
     const hotels = await response.json();
     return hotels;
