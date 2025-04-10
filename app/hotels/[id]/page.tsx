@@ -161,28 +161,32 @@ export default function HotelDetailsPage() {
     Parking: <Car className="h-4 w-4 mr-2" />,
   }
 
-  return (
-    <div className="flex flex-col min-h-screen">
-      <header className="px-6 lg:px-10 h-16 flex items-center justify-between border-b">
-        <Link href="/welcome" className="flex items-center gap-2">
-          <PlaneTakeoff className="h-6 w-6" />
-          <span className="font-bold text-xl">Travelo</span>
-        </Link>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <User className="h-5 w-5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Hi, {username}</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleSignOut}>
-              Sign Out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </header>
+    return (
+      <div className="flex flex-col min-h-screen">
+        <header className="px-6 lg:px-10 h-16 flex items-center justify-between border-b">
+          <Link href="/welcome" className="flex items-center gap-2">
+            <PlaneTakeoff className="h-6 w-6" />
+            <span className="font-bold text-xl">Travelo</span>
+          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <User className="h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Hi, {username}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {/* New menu item to view profile */}
+              <DropdownMenuItem onClick={() => router.push("/profile")}>
+                View Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleSignOut}>
+                Sign Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </header>
 
       <main className="min-h-screen flex flex-col items-center justify-center px-6 py-10">
         <div className="w-full max-w-screen-md">
