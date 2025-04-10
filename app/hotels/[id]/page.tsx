@@ -128,7 +128,7 @@ export default function HotelDetailsPage() {
       return
     }
     if (userElo === 0) {
-      alert("Please enter an Elo ranking")
+      alert("Where would you rank this restaurant")
       return
     }
     const newReview = { name: username, rating: userRating, text: reviewText, elo: userElo }
@@ -321,7 +321,7 @@ export default function HotelDetailsPage() {
 
                     <div>
                       <Label htmlFor="elo" className="block mb-2">
-                        Your Elo Ranking (numeric value)
+                        What would you rank this restaurant?
                       </Label>
                       <Input
                         id="elo"
