@@ -3,6 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, Heart } from "lucide-react";
+import Link from "next/link";
 import type { Hotel } from "@/lib/data";
 
 interface HotelCardProps {
@@ -68,7 +69,9 @@ export function HotelCard({ hotel }: HotelCardProps) {
       </CardContent>
 
       <CardFooter className="p-4 pt-0">
+      <Link href={`/hotels/${hotel.id}`} className="w-full">
         <Button className="w-full">View Details</Button>
+        </Link>
       </CardFooter>
     </Card>
   );

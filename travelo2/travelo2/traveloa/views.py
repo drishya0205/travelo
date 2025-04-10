@@ -2,6 +2,9 @@
 
 from django.http import JsonResponse
 from .models import Hotel, Attraction
+from django.shortcuts import get_object_or_404
+from django.core.serializers.json import DjangoJSONEncoder
+import json
 
 def hotel_list_api(request):
     """
@@ -34,3 +37,19 @@ def rate_hotel(request, hotel_id):
 def rate_attraction(request, attraction_id):
     # (Implement your logic for handling ratings.)
     return JsonResponse({"message": f"Attraction {attraction_id} rated!"})
+
+def hotel_detail_api(request, hotel_id):
+    hotel = get_object_or_404(Hotel, pk=hotel_id)
+    hotel_data = {
+        "id": hotel.id,
+        "name": hotel.name,
+        "location": hotel.location,
+        "price": float(hotel.price),
+        "average_rating": hotel.average_rating,
+        "rating_count": hotel.rating_count,
+        "image": hotel.image,
+        "amenities": hotel.amenities,
+    }
+
+    return JsonResponse(hotel_data, encoder=DjangoJSONEncoder, safe=False)
+
