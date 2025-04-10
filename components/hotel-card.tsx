@@ -11,17 +11,15 @@ interface HotelCardProps {
 
 export function HotelCard({ hotel }: HotelCardProps) {
   const [isFavorite, setIsFavorite] = useState(false);
-
-  // Use hotel.average_rating for display. If it's available, format to one decimal.
   const rating = hotel.average_rating !== undefined ? hotel.average_rating.toFixed(1) : "N/A";
 
   return (
     <Card className="overflow-hidden hover:shadow-xl transition-shadow duration-300">
-      <div className="relative">
+      <div className="relative aspect-[3/2] w-full">
         <img
           src={hotel.image || "/default-hotel.jpg"}
           alt={hotel.name}
-          className="w-full h-48 object-cover"
+          className="w-full h-full object-cover"
         />
         <Button
           variant="ghost"
@@ -33,12 +31,12 @@ export function HotelCard({ hotel }: HotelCardProps) {
           <span className="sr-only">Add to favorites</span>
         </Button>
         {hotel.average_rating !== undefined && hotel.average_rating >= 4.5 && (
-          
           <Badge className="absolute top-2 left-2" variant="secondary">
             Top Rated
           </Badge>
         )}
       </div>
+
       <CardHeader className="p-4 pb-2">
         <div className="flex justify-between items-start">
           <div>
@@ -56,6 +54,7 @@ export function HotelCard({ hotel }: HotelCardProps) {
           )}
         </div>
       </CardHeader>
+
       <CardContent className="p-4 pt-2">
         <div className="mt-2 flex items-center justify-between">
           <div>
@@ -63,12 +62,11 @@ export function HotelCard({ hotel }: HotelCardProps) {
             <span className="text-sm text-muted-foreground"> / night</span>
           </div>
           <div className="text-sm text-muted-foreground">
-            {(hotel.amenities && hotel.amenities.length > 0)
-              ? hotel.amenities.slice(0, 2).join(" • ")
-              : "No amenities"}
+            {hotel.amenities?.length ? hotel.amenities.slice(0, 2).join(" • ") : "No amenities"}
           </div>
         </div>
       </CardContent>
+
       <CardFooter className="p-4 pt-0">
         <Button className="w-full">View Details</Button>
       </CardFooter>

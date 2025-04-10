@@ -22,7 +22,7 @@ export default function ResultsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const location = searchParams?.get("location") ?? "";
-  
+
   const [hotels, setHotels] = useState<any[]>([]);
   const [attractions, setAttractions] = useState<any[]>([]);
   const [username, setUsername] = useState("");
@@ -40,8 +40,6 @@ export default function ResultsPage() {
         console.log("[Travelo] Fetching hotels for:", location);
         const data = await fetchHotels(location);
         console.log("[Travelo] fetchHotels returned:", data);
-
-        console.log("[Travelo] Hotels from API call:", data);
 
         const spots = await fetchAttractions(location);
         console.log("[Travelo] Attractions from API call:", spots);
@@ -63,7 +61,6 @@ export default function ResultsPage() {
     fetchData();
   }, [location]);
 
-  // Optional: sorting logic if needed
   useEffect(() => {
     let sorted = [...hotels];
     if (sortOption === "priceLowToHigh") {
@@ -100,7 +97,7 @@ export default function ResultsPage() {
         </DropdownMenu>
       </header>
 
-      <main className="container mx-auto p-4">
+      <main className="max-w-7xl mx-auto p-4">
         {isLoading ? (
           <div className="flex justify-center items-center h-full min-h-[300px]">
             <p className="text-xl font-semibold">Loading...</p>
@@ -114,6 +111,7 @@ export default function ResultsPage() {
                 <TabsTrigger value="attractions">Top Attractions</TabsTrigger>
               </TabsList>
 
+              {/* Hotels Tab */}
               <TabsContent value="hotels">
                 {error ? (
                   <p className="text-red-500">{error}</p>
@@ -129,30 +127,30 @@ export default function ResultsPage() {
                         <option value="priceHighToLow">Price: High to Low</option>
                       </select>
                     </div>
-                    {filteredHotels.map((hotel) => (
-                      <HotelCard key={hotel.id || hotel.name} hotel={hotel} />
-                    ))}
+                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                      {filteredHotels.map((hotel) => (
+                        <HotelCard key={hotel.id || hotel.name} hotel={hotel} />
+                      ))}
+                    </div>
                   </>
                 ) : (
                   <p>No hotels found.</p>
                 )}
               </TabsContent>
 
+              {/* Attractions Tab */}
               <TabsContent value="attractions">
                 {attractions.length > 0 ? (
-                  attractions.map((attraction) => (
-                    <AttractionCard key={attraction.id || attraction.name} attraction={attraction} />
-                  ))
+                  <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    {attractions.map((attraction) => (
+                      <AttractionCard key={attraction.id || attraction.name} attraction={attraction} />
+                    ))}
+                  </div>
                 ) : (
                   <p>No attractions found.</p>
                 )}
               </TabsContent>
             </Tabs>
-
-            {/* Debug: Render raw JSON data */}
-            {/* <pre className="mt-4 bg-gray-100 p-4 rounded">
-              {JSON.stringify(hotels, null, 2)}
-            </pre> */}
           </>
         )}
       </main>
