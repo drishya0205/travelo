@@ -50,9 +50,10 @@ export default function HotelDetailsPage() {
   const [userRating, setUserRating] = useState(0)
   const [hoverRating, setHoverRating] = useState(0)
   const [reviewText, setReviewText] = useState("")
+  const [userElo, setUserElo] = useState<number>(0)
   const [bookingSuccess, setBookingSuccess] = useState(false)
   const [reviews, setReviews] = useState<
-    Array<{ name: string; rating: number; text: string }>
+    Array<{ name: string; rating: number; text: string; elo: number }>
   >([])
 
   useEffect(() => {
@@ -126,10 +127,15 @@ export default function HotelDetailsPage() {
       alert("Please select a rating")
       return
     }
-    const newReview = { name: username, rating: userRating, text: reviewText }
+    if (userElo === 0) {
+      alert("Please enter an Elo ranking")
+      return
+    }
+    const newReview = { name: username, rating: userRating, text: reviewText, elo: userElo }
     setReviews([...reviews, newReview])
     setUserRating(0)
     setReviewText("")
+    setUserElo(0)
     alert("Thank you for your review!")
   }
 
@@ -269,6 +275,9 @@ export default function HotelDetailsPage() {
                                 </div>
                               </div>
                               <p className="mt-2 text-gray-700">{r.text}</p>
+                              <p className="mt-2 text-sm text-gray-600">
+                                Elo Ranking: {r.elo}
+                              </p>
                             </CardContent>
                           </Card>
                         </div>
@@ -292,8 +301,6 @@ export default function HotelDetailsPage() {
                     <div>
                       <Label htmlFor="rating" className="block mb-5">
                         Your Rating
-                        
-                    
                       </Label>
                       <div className="flex justify-center">
                         {[1, 2, 3, 4, 5].map((r) => (
@@ -311,6 +318,21 @@ export default function HotelDetailsPage() {
                         ))}
                       </div>
                     </div>
+
+                    <div>
+                      <Label htmlFor="elo" className="block mb-2">
+                        Your Elo Ranking (numeric value)
+                      </Label>
+                      <Input
+                        id="elo"
+                        type="number"
+                        value={userElo || ""}
+                        placeholder="Enter Elo ranking"
+                        onChange={(e) => setUserElo(Number(e.target.value))}
+                        className="mt-1"
+                      />
+                    </div>
+
                     <div>
                       <Label htmlFor="review" className="block mb-2">
                         Your Review
