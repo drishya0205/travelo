@@ -1,6 +1,7 @@
 # traveloa/models.py
 
 from django.db import models
+import math
 
 class Hotel(models.Model):
     name = models.CharField(max_length=255)
@@ -10,6 +11,23 @@ class Hotel(models.Model):
     rating_count = models.IntegerField(default=0)
     image = models.URLField(blank=True, null=True)
     amenities = models.JSONField(default=list, blank=True)
+    elo_rating = models.FloatField(default=1500)  # Starting ELO rating
+    
+    def calculate_elo_change(self, opponent_rating, result, k_factor=32):
+        expected_score = 1 / (1 + math.pow(10, (opponent_rating - self.elo_rating) / 400))
+        return k_factor * (result - expected_score)
+    
+    def update_elo_rating(self, opponent_hotel, result):
+        
+        rating_change = self.calculate_elo_change(opponent_hotel.elo_rating, result)
+        
+        # Update both hotels' ratings
+        self.elo_rating += rating_change
+        opponent_hotel.elo_rating -= rating_change
+        
+        # Save both hotels
+        self.save()
+        opponent_hotel.save()
 
     def __str__(self):
         return self.name
