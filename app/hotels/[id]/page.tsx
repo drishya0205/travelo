@@ -327,7 +327,7 @@ export default function HotelDetailsPage() {
                         id="elo"
                         type="number"
                         value={userElo || ""}
-                        placeholder="Enter Elo ranking"
+                        placeholder="Enter  ranking"
                         onChange={(e) => setUserElo(Number(e.target.value))}
                         className="mt-1"
                       />
