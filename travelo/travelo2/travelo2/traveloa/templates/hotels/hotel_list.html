@@ -1,0 +1,24 @@
+<!-- hotels/templates/hotels/hotel_list.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hotel List</title>
+</head>
+<body>
+    <h1>Hotels{% if location %} in "{{ location }}"{% endif %}</h1>
+    {% for hotel in hotels %}
+      <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
+        <h2>{{ hotel.name }}</h2>
+        <p>Location: {{ hotel.location }}</p>
+        <p>Price: ${{ hotel.price }}</p>
+        <p>Rating: {{ hotel.average_rating }} ({{ hotel.rating_count }} ratings)</p>
+        {% if hotel.image %}
+          <img src="{{ hotel.image }}" alt="{{ hotel.name }}" style="max-width: 300px;">
+        {% endif %}
+        <p><a href="{% url 'rate_hotel' hotel.id %}">Rate this hotel</a></p>
+      </div>
+    {% endfor %}
+</body>
+</html>
